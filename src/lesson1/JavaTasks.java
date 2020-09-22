@@ -2,6 +2,12 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -98,8 +104,29 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+    // T = O(N)
+    // R = O(N)
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
+        BufferedReader bR = new BufferedReader(new FileReader(new File(inputName)));
+        BufferedWriter bW = new BufferedWriter(new FileWriter(new File(outputName)));
+        String line;
+        int x = 0;
+        int[] out;
+        ArrayList<Double> in = new ArrayList<>();
+        while ((line = bR.readLine()) != null) {
+            in.add(Double.parseDouble(line));
+        }
+        out = new int[in.size()];
+        for (Double num: in) {
+            out[x] = (int) (num * 10 + 2730);
+            x++;
+        }
+        out = Sorts.countingSort(out, 2730 + 5000);
+        for(int num:out){
+            bW.write(((double)num - 2730)/10 + "\n");
+        }
+        bW.flush();
+        bW.close();
     }
 
     /**
@@ -131,8 +158,38 @@ public class JavaTasks {
      * 2
      * 2
      */
-    static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+    // T = O(N)
+    // R = O(N)
+    static public void sortSequence(String inputName, String outputName) throws IOException {
+        BufferedReader bR = new BufferedReader(new FileReader(new File(inputName)));
+        BufferedWriter bW = new BufferedWriter(new FileWriter(new File(outputName)));
+        HashMap<Integer, Integer> stats = new HashMap<>();
+        String line;
+        int repeats = 0;
+        ArrayList<Integer> out = new ArrayList<>();
+        ArrayList<Integer> maxEntries = new ArrayList<>();
+        while ((line = bR.readLine()) != null) {
+            int current = Integer.parseInt(line);
+            out.add(current);
+            int curC = stats.get(current) == null ? 1 : stats.get(current) + 1;
+            stats.put(current, curC);
+            if (curC > repeats) {
+                maxEntries.clear();
+                repeats = curC;
+                maxEntries.add(current);
+            }
+            if (curC == repeats) maxEntries.add(current);
+        }
+        Collections.sort(maxEntries);
+        repeats = maxEntries.get(0);
+        for (int num: out) {
+            if (num != repeats) bW.write(num + "\n");
+        }
+        for ( int x = 0; x < stats.get(repeats); x++){
+            bW.write(repeats + "\n");
+        }
+        bW.flush();
+        bW.close();
     }
 
     /**
@@ -149,7 +206,19 @@ public class JavaTasks {
      *
      * Результат: second = [1 3 4 9 9 13 15 20 23 28]
      */
+    // T = O(N)
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
-        throw new NotImplementedError();
+        int end = second.length;
+        int frst = 0;
+        int scnd = first.length;
+        for (int x = 0; x < end; x++){
+            if ( scnd == end || (frst != first.length && (Integer) first[frst] <= (Integer) second[scnd])){
+                second[x] = first[frst];
+                frst++;
+            }else {
+                second[x] = second[scnd];
+                scnd++;
+            }
+        }
     }
 }
