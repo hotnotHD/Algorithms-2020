@@ -375,6 +375,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         mergeArrays(arrayOf(4), result3)
         assertArrayEquals(arrayOf(4, 9, 15, 20, 23, 50), result3)
 
+
         fun testGeneratedArrays(
             firstSize: Int,
             secondSize: Int

@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -125,7 +126,6 @@ public class JavaTasks {
         for(int num:out){
             bW.write(((double)num - 2730)/10 + "\n");
         }
-        bW.flush();
         bW.close();
     }
 
@@ -163,7 +163,7 @@ public class JavaTasks {
     static public void sortSequence(String inputName, String outputName) throws IOException {
         BufferedReader bR = new BufferedReader(new FileReader(new File(inputName)));
         BufferedWriter bW = new BufferedWriter(new FileWriter(new File(outputName)));
-        HashMap<Integer, Integer> stats = new HashMap<>();
+        Map<Integer, Integer> stats = new HashMap<>();
         String line;
         int repeats = 0;
         ArrayList<Integer> out = new ArrayList<>();
@@ -188,7 +188,6 @@ public class JavaTasks {
         for ( int x = 0; x < stats.get(repeats); x++){
             bW.write(repeats + "\n");
         }
-        bW.flush();
         bW.close();
     }
 
