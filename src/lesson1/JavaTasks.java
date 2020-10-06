@@ -158,7 +158,7 @@ public class JavaTasks {
      * 2
      * 2
      */
-    // T = O(N)
+    // T = O(N log N)
     // R = O(N)
     static public void sortSequence(String inputName, String outputName) throws IOException {
         BufferedReader bR = new BufferedReader(new FileReader(new File(inputName)));
@@ -211,7 +211,7 @@ public class JavaTasks {
         int frst = 0;
         int scnd = first.length;
         for (int x = 0; x < end; x++){
-            if ( scnd == end || (frst != first.length && (Integer) first[frst] <= (Integer) second[scnd])){
+            if ( scnd == end || (frst != first.length && first[frst].compareTo(second[scnd]) <= 0)){
                 second[x] = first[frst];
                 frst++;
             }else {
