@@ -111,7 +111,26 @@ public class JavaAlgorithms {
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
      */
+    // Т = O(N * ln (N))
+    // N/2 - количество чисел которые проверяем
+    // 2ln (N) ~ соответствует сумме корней от 2 до N/2 на больших интервалах
+    // R = O(N)
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        boolean notPrime = false;
+        int counter = 0;
+        if (limit <= 1) return 0;
+        if (limit == 2) return 1;
+        for (int i = 3; i <= limit;  i = i + 2){  // O(N/2)
+            int x = (int) Math.sqrt(i);
+            for (int j = 2; j <= x; j++) {        // O(2ln (N))
+                if (i % j == 0) {
+                    notPrime = true;
+                    break;
+                }
+            }
+            if (!notPrime) counter++;
+            notPrime = false;
+        }
+        return counter + 1;
     }
 }
