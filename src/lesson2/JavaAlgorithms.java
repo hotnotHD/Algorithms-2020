@@ -97,8 +97,28 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    // T = O(N ^ 2)
+    // R = O(N ^ 2)
+    // так как заполняем и храним двумерный массив
+    static public String longestCommonSubstring(String first, String second) {
+        int[] marker = new int[]{0,0};
+        int[][] subStr = new int[first.length()][second.length()];
+        int lenght = 0;
+        for (int i = 0; i < first.length(); i++) {
+            for (int j = 0; j < second.length(); j++) {
+                if (first.charAt(i) == second.charAt(j)) {
+                    lenght = subStr[i][j] = (i == 0 || j == 0) ? 1 : subStr[i - 1][j - 1] + 1;
+                    if (lenght > marker[0]) {
+                        marker[0] = lenght;
+                        marker[1] = i;
+                    }
+                } else {
+                    subStr[i][j] = 0;
+                }
+            }
+        }
+        if (lenght == 0) return "";
+        return (String) first.subSequence(marker[1] - marker[0] + 1, marker [1] + 1);
     }
 
     /**
@@ -114,7 +134,7 @@ public class JavaAlgorithms {
     // Т = O(N * ln (N))
     // N/2 - количество чисел которые проверяем
     // 2ln (N) ~ соответствует сумме корней от 2 до N/2 на больших интервалах
-    // R = O(N)
+    // R = O(1) счет на месте
     static public int calcPrimesNumber(int limit) {
         boolean notPrime = false;
         int counter = 0;
