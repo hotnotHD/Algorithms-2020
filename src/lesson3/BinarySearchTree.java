@@ -141,28 +141,28 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     public boolean remove(Object o) {
         @SuppressWarnings("unchecked")
         T t = (T)o;
-        Node<T> closest = find(t);
-        assert closest != null;
-        if (t.compareTo(closest.value) != 0) return false;
+        Node<T> toRemove = find(t);
+        assert toRemove != null;
+        if (t.compareTo(toRemove.value) != 0) return false;
 
         Node<T> helper;
-        if (closest.left == null || closest.right == null) {
-            if (closest.right == null && closest.left == null) {
+        if (toRemove.left == null || toRemove.right == null) {
+            if (toRemove.right == null && toRemove.left == null) {
                 helper = null;
-            }else helper = Objects.requireNonNullElseGet(closest.right, () -> closest.left);
+            }else helper = Objects.requireNonNullElseGet(toRemove.right, () -> toRemove.left);
         }else {
-            Node<T> newN = maxRight(closest.left);
-            newN.right = closest.right;
+            Node<T> newN = maxRight(toRemove.left);
+            newN.right = toRemove.right;
             helper = newN;
-            if (newN.value != closest.left.value) {
+            if (newN.value != toRemove.left.value) {
                 Objects.requireNonNull(findParent(newN)).right = newN.left;
-                newN.left = closest.left;
+                newN.left = toRemove.left;
             }
         }
 
-        Node<T> parent = findParent(closest);
+        Node<T> parent = findParent(toRemove);
         if ( parent != null) {
-            boolean isLeft = parent.left != null && parent.left.value == closest.value;
+            boolean isLeft = parent.left != null && parent.left.value == toRemove.value;
             changeGens(parent, helper, isLeft);
         }else {
             root = helper;
@@ -192,12 +192,13 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     }
 
     public class BinarySearchTreeIterator implements Iterator<T> {
-        PriorityQueue<T> ggg = new PriorityQueue<>();
-        Stack<T> iter;
+
+        PriorityQueue<T> queue;
         Object currentN;
+
         private BinarySearchTreeIterator() {
             // Добавьте сюда инициализацию, если она необходима.
-            iter = new Stack<>();
+            queue = new PriorityQueue<>();
             allSee(root);
         }
 
@@ -209,7 +210,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
                 if (cur.right != null) {
                     allSee(cur.right);
                 }
-                ggg.add(cur.value);
+                queue.add(cur.value);
             }
         }
 
@@ -227,7 +228,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         // R = O(1)
         @Override
         public boolean hasNext() {
-            return !ggg.isEmpty();
+            return !queue.isEmpty();
         }
 
         /**
@@ -247,9 +248,9 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         // R = O(1)
         @Override
         public T next() {
-            if (ggg.peek() == null) throw new IllegalStateException();
-            currentN = ggg.peek();
-            return ggg.poll();
+            if (queue.peek() == null) throw new IllegalStateException();
+            currentN = queue.peek();
+            return queue.poll();
         }
 
         /**
