@@ -160,6 +160,10 @@ abstract class AbstractBinarySearchTreeTest {
                     "The tree doesn't have the element $element from the control set."
                 )
             }
+            assertFalse(
+                binarySet.remove(-20),
+                "Remove need to return false if element not in tree"
+            )
             println("All clear!")
         }
     }
@@ -203,6 +207,10 @@ abstract class AbstractBinarySearchTreeTest {
             assertFailsWith<IllegalStateException>("Something was supposedly returned after the elements ended") {
                 binaryIter.next()
             }
+            assertFalse(
+                binaryIter.hasNext(),
+                "hasNext() need to return false after the elements ended."
+            )
             println("All clear!")
         }
     }

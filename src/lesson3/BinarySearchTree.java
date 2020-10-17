@@ -47,6 +47,38 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         }
     }
 
+    private Node<T> findParent(Node<T> child) {
+        if (root == null) return null;
+        return findParent(root, child.value);
+    }
+
+    private Node<T> findParent(Node<T> start, T child) {
+        int comparison = child.compareTo(start.value);
+        if (comparison == 0) {
+            return null;
+        }
+        else if (comparison < 0) {
+            if (start.left.value == child) return start;
+            return findParent(start.left, child);
+        }
+        else {
+            if (start.right.value == child) return start;
+            return findParent(start.right, child);
+        }
+    }
+
+    private Node<T> maxRight (Node<T> cur){
+        if (cur.right == null) return cur;
+        return maxRight(cur.right);
+    }
+
+
+    private Node<T> maxLeft (Node<T> cur){
+        if (cur.left == null) return cur;
+        return maxRight(cur.left);
+    }
+
+
     @Override
     public boolean contains(Object o) {
         @SuppressWarnings("unchecked")
@@ -86,6 +118,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         }
         size++;
         return true;
+        
     }
 
     /**
@@ -99,11 +132,52 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      *
      * Средняя
      */
+
+    // T = O(N) - в худшем случае
+    // Т = O(log(N)) - в лучшем случае
+    // R = O(1)
+
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        @SuppressWarnings("unchecked")
+        T t = (T)o;
+        Node<T> closest = find(t);
+        assert closest != null;
+        if (t.compareTo(closest.value) != 0) return false;
+
+        Node<T> helper;
+        if (closest.left == null || closest.right == null) {
+            if (closest.right == null && closest.left == null) {
+                helper = null;
+            }else helper = Objects.requireNonNullElseGet(closest.right, () -> closest.left);
+        }else {
+            Node<T> newN = maxRight(closest.left);
+            newN.right = closest.right;
+            helper = newN;
+            if (newN.value != closest.left.value) {
+                Objects.requireNonNull(findParent(newN)).right = newN.left;
+                newN.left = closest.left;
+            }
+        }
+
+        Node<T> parent = findParent(closest);
+        if ( parent != null) {
+            boolean isLeft = parent.left != null && parent.left.value == closest.value;
+            changeGens(parent, helper, isLeft);
+        }else {
+            root = helper;
+        }
+        size--;
+        return true;
     }
+
+    private void changeGens (Node<T> parent, Node<T> to, boolean leftS) {
+        if (parent != null) {
+            if (leftS) parent.left = to;
+            else parent.right = to;
+        }
+    }
+
 
     @Nullable
     @Override
@@ -118,9 +192,25 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     }
 
     public class BinarySearchTreeIterator implements Iterator<T> {
-
+        PriorityQueue<T> ggg = new PriorityQueue<>();
+        Stack<T> iter;
+        Object currentN;
         private BinarySearchTreeIterator() {
             // Добавьте сюда инициализацию, если она необходима.
+            iter = new Stack<>();
+            allSee(root);
+        }
+
+        private void allSee(Node<T>  cur){
+            if (root != null) {
+                if (cur.left != null) {
+                    allSee(cur.left);
+                }
+                if (cur.right != null) {
+                    allSee(cur.right);
+                }
+                ggg.add(cur.value);
+            }
         }
 
         /**
@@ -133,10 +223,11 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Средняя
          */
+        // Т = O(1)
+        // R = O(1)
         @Override
         public boolean hasNext() {
-            // TODO
-            throw new NotImplementedError();
+            return !ggg.isEmpty();
         }
 
         /**
@@ -152,10 +243,13 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Средняя
          */
+        // Т = O(logN) - время добавления и удаления элемента в приоритетной очереди
+        // R = O(1)
         @Override
         public T next() {
-            // TODO
-            throw new NotImplementedError();
+            if (ggg.peek() == null) throw new IllegalStateException();
+            currentN = ggg.peek();
+            return ggg.poll();
         }
 
         /**
@@ -170,10 +264,12 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Сложная
          */
+        // T = O(N) - в худшем случае
+        // Т = O(log(N)) - в лучшем случае
+        // R = O(1)
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+           if ( currentN == null || !BinarySearchTree.this.remove(currentN) ) throw new IllegalStateException();
         }
     }
 
