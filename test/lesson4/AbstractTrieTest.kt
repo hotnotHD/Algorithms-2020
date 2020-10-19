@@ -64,6 +64,7 @@ abstract class AbstractTrieTest {
             trie.clear()
             assertEquals(0, trie.size)
             assertFalse("some" in trie)
+            trie.iterator()
         }
     }
 

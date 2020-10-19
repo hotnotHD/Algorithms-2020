@@ -202,7 +202,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
             allSee(root);
         }
 
-        private void allSee(Node<T>  cur){
+        private void allSee(Node<T> cur){
             if (root != null) {
                 if (cur.left != null) {
                     allSee(cur.left);
@@ -224,7 +224,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Средняя
          */
-        // Т = O(1)
+        // Т = O(const)
         // R = O(1)
         @Override
         public boolean hasNext() {

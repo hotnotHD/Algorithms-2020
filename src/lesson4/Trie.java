@@ -1,7 +1,7 @@
 package lesson4;
 
 import java.util.*;
-import kotlin.NotImplementedError;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,6 @@ public class Trie extends AbstractSet<String> implements Set<String> {
     }
 
     private Node root = new Node();
-
     private int size = 0;
 
     @Override
@@ -73,7 +72,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
     @Override
     public boolean remove(Object o) {
         String element = (String) o;
-        Node current = findNode(element);
+        Node current = findNode(element); // Т = O(N)
         if (current == null) return false;
         if (current.children.remove((char) 0) != null) {
             size--;
@@ -92,8 +91,53 @@ public class Trie extends AbstractSet<String> implements Set<String> {
     @NotNull
     @Override
     public Iterator<String> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new TrieIterator();
+    }
+
+    public class TrieIterator implements Iterator<String> {
+        Object currentN;
+        Queue<String> queue = new LinkedList<>();
+        String fulz = "";
+
+        private TrieIterator() {
+            allSee(root);
+        }
+
+        private void allSee(Node cur){
+            Map<Character, Node> x;
+            x = cur.children;
+            Character key;
+            for (Map.Entry<Character, Node> entry : x.entrySet()){
+                key = entry.getKey();
+                if (key == 0) queue.add(fulz);
+                fulz += key;
+                allSee(x.get(key));
+            }
+            if (fulz.length() >= 1) fulz = fulz.substring(0, fulz.length() - 1 );
+        }
+
+        // Т = O(const)
+        // R = O(1)
+        @Override
+        public boolean hasNext() {
+            return !queue.isEmpty();
+        }
+
+        // Т = O(const)
+        // R = O(1)
+        @Override
+        public String next() {
+            if (queue.peek() == null) throw new IllegalStateException();
+            currentN = queue.peek();
+            return queue.poll();
+        }
+
+        // Т = O(N)
+        // R = O(1)
+        @Override
+        public void remove() {
+            if ( currentN == null || !Trie.this.remove(currentN) ) throw new IllegalStateException();
+        }
     }
 
 }
