@@ -278,6 +278,10 @@ abstract class AbstractBinarySearchTreeTest {
                     "The tree has the element $element that is not in control set."
                 )
             }
+            assertFalse(
+                iterator.hasNext(),
+                "hasNext() need to return false after the elements ended."
+            )
             println("All clear!")
         }
     }

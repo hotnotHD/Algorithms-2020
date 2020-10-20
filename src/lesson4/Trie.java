@@ -95,9 +95,9 @@ public class Trie extends AbstractSet<String> implements Set<String> {
     }
 
     public class TrieIterator implements Iterator<String> {
-        Object currentN;
+        Object currentW;
         Queue<String> queue = new LinkedList<>();
-        String fulz = "";
+        String word = "";
 
         private TrieIterator() {
             allSee(root);
@@ -109,11 +109,11 @@ public class Trie extends AbstractSet<String> implements Set<String> {
             Character key;
             for (Map.Entry<Character, Node> entry : x.entrySet()){
                 key = entry.getKey();
-                if (key == 0) queue.add(fulz);
-                fulz += key;
+                if (key == 0) queue.add(word);
+                word += key;
                 allSee(x.get(key));
             }
-            if (fulz.length() >= 1) fulz = fulz.substring(0, fulz.length() - 1 );
+            if (word.length() >= 1) word = word.substring(0, word.length() - 1 );
         }
 
         // Т = O(const)
@@ -128,7 +128,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         @Override
         public String next() {
             if (queue.peek() == null) throw new IllegalStateException();
-            currentN = queue.peek();
+            currentW = queue.peek();
             return queue.poll();
         }
 
@@ -136,7 +136,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         // R = O(1)
         @Override
         public void remove() {
-            if ( currentN == null || !Trie.this.remove(currentN) ) throw new IllegalStateException();
+            if ( currentW == null || !Trie.this.remove(currentW) ) throw new IllegalStateException();
         }
     }
 

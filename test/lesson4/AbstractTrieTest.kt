@@ -108,6 +108,10 @@ abstract class AbstractTrieTest {
             assertFailsWith<IllegalStateException>("Something was supposedly returned after the elements ended") {
                 trieIter.next()
             }
+            assertFalse(
+                trieIter.hasNext(),
+                "hasNext() need to return false after the elements ended."
+            )
             println("All clear!")
         }
     }
@@ -169,6 +173,10 @@ abstract class AbstractTrieTest {
                     "Trie set has the element $element that is not in control set."
                 )
             }
+            assertFalse(
+                iterator.hasNext(),
+                "hasNext() need to return false after the elements ended."
+            )
             println("All clear!")
         }
     }
