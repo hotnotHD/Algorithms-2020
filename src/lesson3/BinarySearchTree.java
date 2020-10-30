@@ -72,13 +72,6 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         return maxRight(cur.right);
     }
 
-
-    private Node<T> maxLeft (Node<T> cur){
-        if (cur.left == null) return cur;
-        return maxRight(cur.left);
-    }
-
-
     @Override
     public boolean contains(Object o) {
         @SuppressWarnings("unchecked")
@@ -138,31 +131,32 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     // R = O(1)
 
     @Override
-    public boolean remove(Object o) {
-        @SuppressWarnings("unchecked")
+    public boolean remove(Object o){
         T t = (T)o;
         Node<T> toRemove = find(t);
-        assert toRemove != null;
-        if (t.compareTo(toRemove.value) != 0) return false;
+        if (toRemove == null || t.compareTo(toRemove.value) != 0) return false;
+        return remove(toRemove);
+    }
 
+    private boolean remove(Node<T> o) {
         Node<T> helper;
-        if (toRemove.left == null || toRemove.right == null) {
-            if (toRemove.right == null && toRemove.left == null) {
+        if (o.left == null || o.right == null) {
+            if (o.right == null && o.left == null) {
                 helper = null;
-            }else helper = Objects.requireNonNullElseGet(toRemove.right, () -> toRemove.left);
+            }else helper = Objects.requireNonNullElseGet(o.right, () -> o.left);
         }else {
-            Node<T> newN = maxRight(toRemove.left);
-            newN.right = toRemove.right;
+            Node<T> newN = maxRight(o.left);
+            newN.right = o.right;
             helper = newN;
-            if (newN.value != toRemove.left.value) {
+            if (newN.value != o.left.value) {
                 Objects.requireNonNull(findParent(newN)).right = newN.left;
-                newN.left = toRemove.left;
+                newN.left = o.left;
             }
         }
 
-        Node<T> parent = findParent(toRemove);
+        Node<T> parent = findParent(o);
         if ( parent != null) {
-            boolean isLeft = parent.left != null && parent.left.value == toRemove.value;
+            boolean isLeft = parent.left != null && parent.left.value == o.value;
             changeGens(parent, helper, isLeft);
         }else {
             root = helper;
@@ -178,7 +172,6 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         }
     }
 
-
     @Nullable
     @Override
     public Comparator<? super T> comparator() {
@@ -193,12 +186,12 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
 
     public class BinarySearchTreeIterator implements Iterator<T> {
 
-        PriorityQueue<T> queue;
-        Object currentN;
+        Queue<Node<T>> queue;
+        Node<T> currentN;
 
         private BinarySearchTreeIterator() {
             // Добавьте сюда инициализацию, если она необходима.
-            queue = new PriorityQueue<>();
+            queue = new LinkedList<>();
             allSee(root);
         }
 
@@ -207,10 +200,10 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
                 if (cur.left != null) {
                     allSee(cur.left);
                 }
+                queue.add(cur);
                 if (cur.right != null) {
                     allSee(cur.right);
                 }
-                queue.add(cur.value);
             }
         }
 
@@ -244,13 +237,13 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Средняя
          */
-        // Т = O(logN) - время добавления и удаления элемента в приоритетной очереди
+        // Т = O(const)
         // R = O(1)
         @Override
         public T next() {
             if (queue.peek() == null) throw new IllegalStateException();
             currentN = queue.peek();
-            return queue.poll();
+            return queue.poll().value;
         }
 
         /**
@@ -271,6 +264,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         @Override
         public void remove() {
            if ( currentN == null || !BinarySearchTree.this.remove(currentN) ) throw new IllegalStateException();
+           currentN = null;
         }
     }
 
