@@ -249,8 +249,9 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Средняя
          */
-        // Т = O(const)
-        // R = O(N)
+        // T = O(N) - в худшем случае
+        // Т = O(log(N)) - в лучшем случае
+        // R = O(const)
         @Override
         public T next() {
             if (first){
