@@ -72,6 +72,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         return maxRight(cur.right);
     }
 
+
     @Override
     public boolean contains(Object o) {
         @SuppressWarnings("unchecked")
@@ -186,25 +187,36 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
 
     public class BinarySearchTreeIterator implements Iterator<T> {
 
-        Queue<Node<T>> queue;
+        T maxValue;
+        Node<T> previousN;
         Node<T> currentN;
+        boolean first = true;
+        boolean end = false;
+        boolean doubleTrouble = false;
 
         private BinarySearchTreeIterator() {
             // Добавьте сюда инициализацию, если она необходима.
-            queue = new LinkedList<>();
-            allSee(root);
+            if (root != null) {
+                currentN = root;
+                maxValue = BinarySearchTree.this.maxRight(root).value;
+            }
         }
 
-        private void allSee(Node<T> cur){
-            if (root != null) {
-                if (cur.left != null) {
-                    allSee(cur.left);
-                }
-                queue.add(cur);
-                if (cur.right != null) {
-                    allSee(cur.right);
-                }
+        private void up(){
+            currentN = BinarySearchTree.this.findParent(currentN);
+            if (previousN.value.compareTo(currentN.value) > 0){
+                up();
             }
+        }
+
+        private Node<T> maxLeft (Node<T> cur){
+            if (cur.left == null) return null;
+            Node<T> x = cur.left;
+            while (x != null){
+                cur = x;
+                x = x.left;
+            }
+            return cur;
         }
 
         /**
@@ -221,7 +233,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         // R = O(1)
         @Override
         public boolean hasNext() {
-            return !queue.isEmpty();
+            return ((root != null) && (currentN.value.compareTo(maxValue) != 0));
         }
 
         /**
@@ -238,12 +250,34 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          * Средняя
          */
         // Т = O(const)
-        // R = O(1)
+        // R = O(N)
         @Override
         public T next() {
-            if (queue.peek() == null) throw new IllegalStateException();
-            currentN = queue.peek();
-            return queue.poll().value;
+            if (first){
+                if (root.left != null) currentN = maxLeft(root);
+                first = false;
+                return currentN.value;
+            }
+            if (end){
+                throw new IllegalStateException();
+            }
+            if (currentN.right == null && currentN.left == null){
+                previousN = currentN;
+                up();
+            }
+            if (currentN.right != null) {
+                Node<T> x;
+                currentN = currentN.right;
+                x = maxLeft(currentN);
+                if (x != null) {
+                    currentN = x;
+                }
+            }else {
+                up();
+            }
+            if (currentN.value.compareTo(maxValue) == 0) end = true;
+            doubleTrouble = false;
+            return currentN.value;
         }
 
         /**
@@ -263,8 +297,8 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         // R = O(1)
         @Override
         public void remove() {
-           if ( currentN == null || !BinarySearchTree.this.remove(currentN) ) throw new IllegalStateException();
-           currentN = null;
+           if ( doubleTrouble || first || !BinarySearchTree.this.remove(currentN)) throw new IllegalStateException();
+           doubleTrouble = true;
         }
     }
 
