@@ -95,23 +95,39 @@ public class Trie extends AbstractSet<String> implements Set<String> {
     }
 
     public class TrieIterator implements Iterator<String> {
-        Object currentW;
+        String currentW;
         Queue<String> queue = new LinkedList<>();
         String word = "";
+        int counter = 0;
+        int limit;
+        List<String> chars = new ArrayList<>();
 
         private TrieIterator() {
-            allSee(root);
+            Map<Character, Node> x = root.children;
+            limit = x.size();
+            for (Map.Entry<Character, Node> entry : x.entrySet()) {
+                Character key = entry.getKey();
+                chars.add(String.valueOf(key));
+            }
+            allSee();
         }
 
-        private void allSee(Node cur){
-            Map<Character, Node> x;
-            x = cur.children;
-            Character key;
+        private void allSee(){
+            if (counter < limit) {
+                word = "";
+                word += chars.get(counter);
+                oneBranch(Objects.requireNonNull(findNode(chars.get(counter))));
+                counter++;
+            }
+        }
+
+        private void oneBranch(Node cur){
+            Map<Character, Node> x= cur.children;
             for (Map.Entry<Character, Node> entry : x.entrySet()){
-                key = entry.getKey();
+                Character key = entry.getKey();
                 if (key == 0) queue.add(word);
                 word += key;
-                allSee(x.get(key));
+                oneBranch(x.get(key));
             }
             if (word.length() >= 1) word = word.substring(0, word.length() - 1 );
         }
@@ -124,12 +140,15 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         }
 
         // Т = O(const)
-        // R = O(1)
+        // R = O(2N) N - длина одной ветки
         @Override
         public String next() {
             if (queue.peek() == null) throw new IllegalStateException();
-            currentW = queue.peek();
-            return queue.poll();
+            currentW = queue.poll();
+            if (queue.peek() == null) {
+                allSee();
+            }
+            return currentW;
         }
 
         // Т = O(N)
