@@ -114,8 +114,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
         private void allSee(){
             if (counter < limit) {
-                word = "";
-                word += chars.get(counter);
+                word = chars.get(counter);
                 oneBranch(Objects.requireNonNull(findNode(chars.get(counter))));
                 counter++;
             }
