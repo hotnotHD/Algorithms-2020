@@ -2,8 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -33,8 +32,57 @@ public class JavaGraphTasks {
      * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
      * связного графа ровно по одному разу
      */
+
+    //Алгоритм решения взят с сайта: https://bit.ly/2UTVo16
+    // R = O(2E) V - кол-во вершин
+    // T = O(E)   E - кол-во ребер
     public static List<Graph.Edge> findEulerLoop(Graph graph) {
-        throw new NotImplementedError();
+        List<Graph.Edge> list = new ArrayList<>();
+        if (graph.getVertices().isEmpty() || !isEuler(graph)){ // R = O(V)
+            return list;
+        }
+        Graph.Vertex first = null;
+        for (Graph.Vertex vertex: graph.getVertices()){ // R = O(V)
+            first = vertex;
+            break;
+        }
+        Set<Graph.Edge> paths = graph.getEdges();
+        Stack<Graph.Vertex> stack = new Stack<>();
+        stack.push(first);
+        while (!stack.empty()){ // R = O(E+E)
+            Graph.Vertex cur = stack.peek();
+            boolean found = false;
+            for (Graph.Vertex vertex: graph.getNeighbors(cur)) { // стэк заполняется вершинами в нужном порядке
+                Graph.Edge edge = graph.getConnection(cur, vertex); // на кол-во E
+                if (paths.contains(edge)) {
+                    stack.push(vertex);
+                    paths.remove(edge);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {   // стэк очищается на кол-во Е
+                if(first == cur){
+                    stack.pop();
+                    cur = stack.peek();
+                }
+                stack.pop();
+                list.add(graph.getConnection(cur, first));
+                first = cur;
+            }
+        }
+        if(!paths.isEmpty()){
+            list.clear();
+        }
+        return list;
+    }
+
+    public static boolean isEuler(Graph graph) {
+        for (Graph.Vertex vertex: graph.getVertices()){
+            if (graph.getConnections(vertex).size() % 2 != 0 || graph.getConnections(vertex).size() == 0)
+                return false;
+        }
+       return true;
     }
 
     /**
