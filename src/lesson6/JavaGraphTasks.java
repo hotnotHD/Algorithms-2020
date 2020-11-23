@@ -167,9 +167,58 @@ public class JavaGraphTasks {
      *
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
-    public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+
+    public static class Helper {
+        Graph graph;
+        Path maxPath = new Path();
+        List<Graph.Vertex> currentPathL = new ArrayList<>();
+
+        public Helper(Graph graph){
+            this.graph = graph;
+        }
+
+        public Path search(){ // O(C * V * V) ~ O(V^2)
+            for(Graph.Vertex vertex : graph.getVertices()){ // O(V)
+                rec(vertex);
+            }
+            return maxPath;
+        }
+
+        public Path pathPacker(List<Graph.Vertex> list){
+            Path path = new Path(list.get(0));
+            for (int i = 1; i < list.size(); i++){
+                path = new Path(path, graph, list.get(i));
+            }
+            return path;
+        }
+
+        public void rec(Graph.Vertex vertex){ // O(C * V) C - кол-во соединений от вершины
+            if(!currentPathL.contains(vertex)){
+                currentPathL.add(vertex);
+                if(maxPath.getLength() + 1 < currentPathL.size()) {
+                    maxPath = pathPacker(currentPathL);
+                }
+                for (Graph.Vertex next : graph.getNeighbors(vertex)){
+                    if(!currentPathL.contains(next)) {
+                        rec(next);
+                    }
+                }
+                currentPathL.remove(vertex);
+            }
+        }
     }
+
+    // T = O(V^2) V -кол-во вершин
+    // R = O(V^2) максимальное сначение в худшем случае
+
+    public static Path longestSimplePath(Graph graph) {
+        if(graph.getVertices().isEmpty() || graph.getEdges().isEmpty()) return new Path();
+        Helper solv = new Helper(graph);
+        return solv.search();
+    }
+
+
+
 
 
     /**
